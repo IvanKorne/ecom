@@ -31,7 +31,7 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <main className="max-w-max">
+        <main className="max-w-max mx-auto">
           <Navbar />
           {children}
         </main>
