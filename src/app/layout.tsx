@@ -5,6 +5,7 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+//Font imported
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700"],

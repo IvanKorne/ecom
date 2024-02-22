@@ -11,7 +11,12 @@ const Home = () => {
           <div className="flex flex-col justify-center">
             <p className="flex gap-2 text-sm font-medium text-primary">
               Find the Lowest Prices Anywhere
-              <Image src={rightArrow} alt="right-arrow" width={15} />
+              <Image
+                src={rightArrow}
+                alt="right-arrow"
+                width={15}
+                height={10}
+              />
             </p>
             <h1 className="mt text-6xl font-bold tracking-tight leading-[72px] ">
               Shop Smarter with <span className="text-yellow-500">e</span>
