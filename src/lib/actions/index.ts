@@ -24,15 +24,17 @@ async function scrapeProduct(productURL: string) {
     try {
       const response = await axios.get(productURL, selection);
       const $ = cheerio.load(response.data);
+
       const title = $("#productTitle").text().trim();
-      //pass in everthing related to price
+
+      //Using cheerio to extract data from response by using their id's
       const currentPrice = extractPrice(
         $(".priceToPay span.a-price-whole"),
         $(".a.size.base.a-color-price"),
         $(".a-button-selected .a-color-base")
       );
 
-      const originalprice = extractPrice(
+      const originalPrice = extractPrice(
         $("#priceblock_ourprice"),
         $(".a-price.a-text-price span.a-offscreen"),
         $("#listPrice"),
@@ -54,15 +56,23 @@ async function scrapeProduct(productURL: string) {
       const discountRate = $(".savingsPercentage").text().replace(/[-%]/g, "");
 
       const curreny = extractCurrency($(".a-price-symbol"));
-      console.log({
+
+      const data = {
+        productURL,
+        curreny: curreny || "$",
+        image: imageURL[0],
         title,
-        currentPrice,
-        originalprice,
-        outOfStock,
-        image,
-        curreny,
-        discountRate,
-      });
+        currentPrice: Number(currentPrice) || Number(originalPrice),
+        originalPrice: Number(originalPrice) || Number(currentPrice),
+        prices: [],
+        discountRate: Number(discountRate),
+        category: "category",
+        reviews: 75,
+        stars: 4,
+        isOutofStock: outOfStock,
+      };
+
+      console.log(data);
     } catch (err: any) {
       throw new Error(`Failed to retrieve product: ${err.message}`);
     }
