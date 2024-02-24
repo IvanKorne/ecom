@@ -7,7 +7,11 @@ const checkValidLink = (url: string) => {
   try {
     const check = new URL(url);
     const hostname = check.hostname;
-    if (hostname.includes("amazon.ca") || hostname.includes("amazon.com")) {
+    if (
+      hostname.includes("amazon.com") ||
+      hostname.includes("amazon.") ||
+      hostname.endsWith("amazon")
+    ) {
       return true;
     }
   } catch (err) {

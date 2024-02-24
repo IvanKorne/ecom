@@ -1,7 +1,11 @@
 "use server";
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { extractPrice, extractCurrency } from "../utils";
+import { revalidatePath } from "next/cache";
+import { extractPrice, extractCurrency, extractDescription } from "../utils";
+import { connectToDB } from "../mongoose";
+import { getLowestPrice, getHighestPrice, getAveragePrice } from "../utils";
+import Product from "@/models/productModel";
 
 //Finding the product on Amazon using bright_data webscraper
 async function scrapeProduct(productURL: string) {
@@ -52,10 +56,11 @@ async function scrapeProduct(productURL: string) {
         "{}";
 
       const imageURL = Object.keys(JSON.parse(image));
+      const curreny = extractCurrency($(".a-price-symbol"));
 
       const discountRate = $(".savingsPercentage").text().replace(/[-%]/g, "");
 
-      const curreny = extractCurrency($(".a-price-symbol"));
+      const description = extractDescription($);
 
       const data = {
         productURL,
@@ -64,15 +69,19 @@ async function scrapeProduct(productURL: string) {
         title,
         currentPrice: Number(currentPrice) || Number(originalPrice),
         originalPrice: Number(originalPrice) || Number(currentPrice),
-        prices: [],
+        priceHistory: <any>[],
         discountRate: Number(discountRate),
         category: "category",
         reviews: 75,
         stars: 4,
         isOutofStock: outOfStock,
+        description,
+        lowestPrice: Number(originalPrice) || Number(currentPrice),
+        highestPrice: Number(originalPrice) || Number(currentPrice),
+        average: Number(originalPrice) || Number(currentPrice),
       };
 
-      console.log(data);
+      return data;
     } catch (err: any) {
       throw new Error(`Failed to retrieve product: ${err.message}`);
     }
@@ -85,9 +94,53 @@ export async function scrapeAndStoreProduct(productURL: string) {
     return;
   } else {
     try {
+      connectToDB();
       const scrapedProduct = await scrapeProduct(productURL);
+      if (!scrapedProduct) {
+        return;
+      }
+
+      let product = scrapedProduct;
+
+      const prevProduct = await Product.findOne({
+        productURL: scrapedProduct.productURL,
+      });
+
+      if (prevProduct) {
+        const updatePriceHistory: any = [
+          ...prevProduct.priceHistory,
+          { price: scrapedProduct.currentPrice },
+        ];
+        product = {
+          ...scrapedProduct,
+          priceHistory: updatePriceHistory,
+          lowestPrice: getLowestPrice(updatePriceHistory),
+          highestPrice: getHighestPrice(updatePriceHistory),
+          averagePrice: getAveragePrice(updatePriceHistory),
+        };
+      }
+
+      const newProduct = await Product.findOneAndUpdate(
+        { productURL: scrapedProduct.productURL },
+        product,
+        { upsert: true, new: true }
+      );
+
+      revalidatePath(`/products/${newProduct._id}`);
     } catch (err: any) {
       throw new Error(`Failed to retrieve/store product: ${err.message}`);
     }
+  }
+}
+
+export async function getProductById(productId: string) {
+  try {
+    connectToDB();
+    const product = await Product.findOne({ _id: productId });
+    if (!product) {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
   }
 }

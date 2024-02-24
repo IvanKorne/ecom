@@ -15,7 +15,7 @@ const Home = () => {
                 src={rightArrow}
                 alt="right-arrow"
                 width={15}
-                height={10}
+                height={12}
               />
             </p>
             <h1 className="mt text-6xl font-bold tracking-tight leading-[72px] ">
