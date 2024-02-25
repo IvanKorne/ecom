@@ -46,6 +46,7 @@ async function scrapeProduct(productURL: string) {
         $(".a-size-base.a-color-price")
       );
 
+      const stars = $("span.a-size-base .a-color-base");
       const outOfStock =
         $("#availability span").text().trim().toLowerCase() ===
         "currently unavailable";
@@ -56,7 +57,7 @@ async function scrapeProduct(productURL: string) {
         "{}";
 
       const imageURL = Object.keys(JSON.parse(image));
-      const curreny = extractCurrency($(".a-price-symbol"));
+      const currency = extractCurrency($(".a-price-symbol"));
 
       const discountRate = $(".savingsPercentage").text().replace(/[-%]/g, "");
 
@@ -64,7 +65,7 @@ async function scrapeProduct(productURL: string) {
 
       const data = {
         productURL,
-        curreny: curreny || "$",
+        currency: currency || "$",
         image: imageURL[0],
         title,
         currentPrice: Number(currentPrice) || Number(originalPrice),
@@ -72,8 +73,8 @@ async function scrapeProduct(productURL: string) {
         priceHistory: <any>[],
         discountRate: Number(discountRate),
         category: "category",
-        reviews: 75,
-        stars: 4,
+        reviewsCount: 100,
+        stars: Number(stars),
         isOutofStock: outOfStock,
         description,
         lowestPrice: Number(originalPrice) || Number(currentPrice),
@@ -140,6 +141,17 @@ export async function getProductById(productId: string) {
     if (!product) {
       return null;
     }
+    return product;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function getAllProducts() {
+  try {
+    connectToDB();
+    const products = await Product.find();
+    return products;
   } catch (err) {
     console.log(err);
   }

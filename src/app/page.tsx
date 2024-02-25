@@ -3,7 +3,10 @@ import Image from "next/image";
 import rightArrow from "../assets/icons/arrow-right.png";
 import Searchbar from "@/components/Searchbar";
 import Hero from "@/components/Hero";
-const Home = () => {
+import { getAllProducts } from "@/lib/actions";
+import ProductCard from "@/components/ProductCard";
+const Home = async () => {
+  const allProducts = await getAllProducts();
   return (
     <>
       <div className="px-6 md:px-20 py-24 ">
@@ -34,8 +37,8 @@ const Home = () => {
       <div className="flex flex-col gap-10 px-6 md:px-20 py-24">
         <h1 className="font-semibold text-3xl">Trending</h1>
         <div className="flex flew-wrap gap-x-8 gap-y-16">
-          {["Pans", "Playstation", "Bottle"].map((product) => (
-            <div>{product}</div>
+          {allProducts?.map((product: any) => (
+            <ProductCard key={product._id} product={product} />
           ))}
         </div>
       </div>
