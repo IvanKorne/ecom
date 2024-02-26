@@ -16,8 +16,10 @@ const heroImages = [
   { src: phone, alt: "phone" },
   { src: bed, alt: "bed" },
 ];
-//Carousel is an NPM package can be installed online, making implementing sliders much easier.
-//It uses useState, hence why this needs to be client-sided
+
+// Carousel is an NPM package can be installed online, making implementing sliders much easier.
+// It uses useState, hence why this needs to be client-sided
+
 const Hero = () => {
   return (
     <div className="relative sm:px-10 py-5 sm:pt-20 pb-5 max-w-[560px] h-[700px] w-full bg-[#F2F4F7] rounded-[30px] sm:mx-auto">

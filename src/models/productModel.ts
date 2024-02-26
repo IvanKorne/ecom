@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+//Sets what the data should look like in the database
 const productSchema = new mongoose.Schema(
   {
     productURL: { type: String, required: true, unique: true },

@@ -5,7 +5,9 @@ import Searchbar from "@/components/Searchbar";
 import Hero from "@/components/Hero";
 import { getAllProducts } from "@/lib/actions";
 import ProductCard from "@/components/ProductCard";
+
 const Home = async () => {
+  // In order to display our products, we need to fetch them, hence why the Home component is async
   const allProducts = await getAllProducts();
   return (
     <>

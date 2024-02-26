@@ -7,6 +7,7 @@ const checkValidLink = (url: string) => {
   try {
     const check = new URL(url);
     const hostname = check.hostname;
+    //Checks to see if the hostname is a valid link
     if (
       hostname.includes("amazon.com") ||
       hostname.includes("amazon.") ||
@@ -31,7 +32,7 @@ const Searchbar = () => {
     }
     try {
       setLoading(true);
-      //scrape the porduct
+      // Scrape Amazon for the product
       const product = await scrapeAndStoreProduct(link);
     } catch (err) {
       console.log(err);

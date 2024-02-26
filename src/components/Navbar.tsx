@@ -6,6 +6,7 @@ import search from "../assets/icons/search.png";
 import emptyHeart from "../assets/icons/empty-heart.png";
 import user from "../assets/icons/user.png";
 
+// Navigation icons to map through
 const NavIcons = [
   {
     src: search,

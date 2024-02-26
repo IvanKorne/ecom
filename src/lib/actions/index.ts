@@ -6,6 +6,7 @@ import { extractPrice, extractCurrency, extractDescription } from "../utils";
 import { connectToDB } from "../mongoose";
 import { getLowestPrice, getHighestPrice, getAveragePrice } from "../utils";
 import Product from "@/models/productModel";
+import { User } from "@/types";
 
 //Finding the product on Amazon using bright_data webscraper
 async function scrapeProduct(productURL: string) {
@@ -46,7 +47,6 @@ async function scrapeProduct(productURL: string) {
         $(".a-size-base.a-color-price")
       );
 
-      const stars = $("span.a-size-base .a-color-base");
       const outOfStock =
         $("#availability span").text().trim().toLowerCase() ===
         "currently unavailable";
@@ -74,12 +74,12 @@ async function scrapeProduct(productURL: string) {
         discountRate: Number(discountRate),
         category: "category",
         reviewsCount: 100,
-        stars: Number(stars),
+        stars: 4,
         isOutofStock: outOfStock,
         description,
-        lowestPrice: Number(originalPrice) || Number(currentPrice),
+        lowestPrice: Number(currentPrice) || Number(originalPrice),
         highestPrice: Number(originalPrice) || Number(currentPrice),
-        average: Number(originalPrice) || Number(currentPrice),
+        average: Number(currentPrice) || Number(originalPrice),
       };
 
       return data;
@@ -156,3 +156,44 @@ export async function getAllProducts() {
     console.log(err);
   }
 }
+
+export async function getSimilarProducts(productId: string) {
+  try {
+    connectToDB();
+
+    const current = await Product.findById(productId);
+
+    if (!current) return null;
+
+    const similar = await Product.find({
+      _id: { $ne: productId },
+    }).limit(3);
+
+    return similar;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const addUserEmailToProduct = async (
+  productId: string,
+  userEmail: string
+) => {
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return;
+    }
+    const currentUser = product.users.some(
+      (user: User) => user.email === userEmail
+    );
+
+    if (!currentUser) {
+      product.users.push({ email: userEmail });
+      await product.save();
+      const emailContent = generateEmailBody(product, "WELCOME");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
