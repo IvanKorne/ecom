@@ -9,8 +9,8 @@ import {
 } from "@/lib/utils";
 import Product from "@/models/productModel";
 import { NextResponse } from "next/server";
-const revalidate = 0;
 
+export const revalidate = 0;
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
