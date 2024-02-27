@@ -18,15 +18,18 @@ export const revalidate = 0;
 export async function GET(request: Request) {
   try {
     connectToDB();
+
     const products = await Product.find({});
+
     if (!products) {
       throw new Error("No products found");
     }
+
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct: any) => {
         const updatedProduct = await scrapeProduct(currentProduct.productURL);
         if (!updatedProduct) {
-          throw new Error("No Product Found");
+          return;
         }
 
         // Copied from index.ts from lib/actions: Updating the product with new prices
@@ -35,7 +38,7 @@ export async function GET(request: Request) {
           { price: updatedProduct.currentPrice },
         ];
         const product = {
-          ...currentProduct,
+          ...updatedProduct,
           priceHistory: updatePriceHistory,
           lowestPrice: getLowestPrice(updatePriceHistory),
           highestPrice: getHighestPrice(updatePriceHistory),
@@ -68,7 +71,7 @@ export async function GET(request: Request) {
       message: "OK",
       data: updatedProducts,
     });
-  } catch (err) {
-    throw new Error(`Get Error: ${err}`);
+  } catch (err: any) {
+    throw new Error(`Get Error: ${err.message}`);
   }
 }
