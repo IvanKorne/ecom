@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import x from "../assets/icons/close.png";
 import logo from "../app/icon.png";
@@ -13,7 +14,7 @@ type ProductProps = {
 
 const Modal = ({ productId }: ProductProps) => {
   // Sets the state of our modal
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [submit, setSubmit] = useState(false);
   const [email, setEmail] = useState("");
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
