@@ -9,6 +9,10 @@ import {
 } from "@/lib/utils";
 import Product from "@/models/productModel";
 import { NextResponse } from "next/server";
+const revalidate = 0;
+
+export const maxDuration = 300;
+export const dynamic = "force-dynamix";
 
 // Cron allows us to rescrape products automatically, showing us the updated prices
 export async function GET(request: Request) {
@@ -39,7 +43,7 @@ export async function GET(request: Request) {
         };
 
         const newProduct = await Product.findOneAndUpdate(
-          { productURL: updatedProduct.productURL },
+          { productURL: product.productURL },
           product
         );
 
