@@ -10,15 +10,15 @@ import {
 import Product from "@/models/productModel";
 import { NextResponse } from "next/server";
 
-export const revalidate = 0;
-export const maxDuration = 300;
+export const maxDuration = 300; // This function can run for a maximum of 300 seconds
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // Cron allows us to rescrape products automatically, showing us the updated prices
 export async function GET(request: Request) {
   try {
     connectToDB();
-    const products = Product.find({});
+    const products = await Product.find({});
     if (!products) {
       throw new Error("No products found");
     }
