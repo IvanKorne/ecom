@@ -7,23 +7,34 @@ import mail from "../assets/icons/mail.png";
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { addUserEmailToProduct } from "../lib/actions/index";
+import z from "zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type ProductProps = {
   productId: string;
 };
 
+const schema = z.object({
+  email: z.string().email(),
+});
+
+type FormFields = z.infer<typeof schema>;
+
 const Modal = ({ productId }: ProductProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<FormFields>({
+    resolver: zodResolver(schema),
+  });
+
   // Sets the state of our modal
   const [isOpen, setIsOpen] = useState(true);
-  const [submit, setSubmit] = useState(false);
-  const [email, setEmail] = useState("");
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmit(true);
 
-    await addUserEmailToProduct(productId, email);
-
-    setSubmit(false);
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    await addUserEmailToProduct(productId, data.email);
     setIsOpen(false);
   };
 
@@ -99,7 +110,10 @@ const Modal = ({ productId }: ProductProps) => {
                     Never miss a deal by signing up your email.
                   </p>
                 </div>
-                <form className="flex flex-col mt-5" onSubmit={handleSubmit}>
+                <form
+                  className="flex flex-col mt-5"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
                   <label
                     htmlFor="email"
                     className="text-sm font-semi-bold text-gray-700"
@@ -111,17 +125,17 @@ const Modal = ({ productId }: ProductProps) => {
                     <input
                       type="email"
                       required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      {...register("email")}
                       placeholder="Enter Email Here"
                       className="flex-1  border-none text-gray-500 text-base border border-gray-300 rounded-xl focus:outline-none shadow-xs"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="px-5 py-3 text-white text-base font-semibold  bg-purple-700 rounded-lg mt-8 hover:opacity-80"
+                    className="px-5 py-3 text-white text-base font-semibold  bg-purple-700 rounded-lg mt-8 hover:opacity-80 disabled:pointer-events-none disabled:opacity-40"
+                    disabled={isSubmitting}
                   >
-                    {submit ? "Submitting..." : "Submit"}
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </button>
                 </form>
               </div>
