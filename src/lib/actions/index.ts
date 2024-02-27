@@ -7,9 +7,10 @@ import { connectToDB } from "../mongoose";
 import { getLowestPrice, getHighestPrice, getAveragePrice } from "../utils";
 import Product from "@/models/productModel";
 import { User } from "@/types";
+import { generateEmailBody, sendEmail } from "../nodemailer";
 
 //Finding the product on Amazon using bright_data webscraper
-async function scrapeProduct(productURL: string) {
+export async function scrapeProduct(productURL: string) {
   if (!productURL) {
     return;
   } else {
@@ -75,11 +76,11 @@ async function scrapeProduct(productURL: string) {
         category: "category",
         reviewsCount: 100,
         stars: 4,
-        isOutofStock: outOfStock,
+        isOutOfStock: outOfStock,
         description,
         lowestPrice: Number(currentPrice) || Number(originalPrice),
         highestPrice: Number(originalPrice) || Number(currentPrice),
-        average: Number(currentPrice) || Number(originalPrice),
+        averagePrice: Number(currentPrice) || Number(originalPrice),
       };
 
       return data;
@@ -107,6 +108,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
         productURL: scrapedProduct.productURL,
       });
 
+      // This is checking if it's already in database, which inturn will update it
       if (prevProduct) {
         const updatePriceHistory: any = [
           ...prevProduct.priceHistory,
@@ -191,7 +193,8 @@ export const addUserEmailToProduct = async (
     if (!currentUser) {
       product.users.push({ email: userEmail });
       await product.save();
-      const emailContent = generateEmailBody(product, "WELCOME");
+      const emailContent = await generateEmailBody(product, "WELCOME");
+      await sendEmail(emailContent, [userEmail]);
     }
   } catch (err) {
     console.log(err);

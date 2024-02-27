@@ -149,7 +149,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               />
             </div>
           </div>
-          <Modal></Modal>
+          <Modal productId={product._id || ""} />
         </div>
       </div>
       <div className=" flex flex-col gap-16 border-purple-100 border-2 p-3">

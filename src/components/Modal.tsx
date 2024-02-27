@@ -6,7 +6,12 @@ import mail from "../assets/icons/mail.png";
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { addUserEmailToProduct } from "../lib/actions/index";
-const Modal = () => {
+
+type ProductProps = {
+  productId: string;
+};
+
+const Modal = ({ productId }: ProductProps) => {
   // Sets the state of our modal
   const [isOpen, setIsOpen] = useState(false);
   const [submit, setSubmit] = useState(false);
@@ -14,7 +19,8 @@ const Modal = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmit(true);
-    //Set Email with user ID
+
+    await addUserEmailToProduct(productId, email);
 
     setSubmit(false);
     setIsOpen(false);

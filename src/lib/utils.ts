@@ -91,6 +91,7 @@ export function getAveragePrice(priceList: PriceHistoryItem[]) {
   return averagePrice;
 }
 
+// Returns the correct notification type for the case
 export const getEmailNotifType = (
   scrapedProduct: Product,
   currentProduct: Product
